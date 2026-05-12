@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Training Scenario Builder (Local-Only)</title>
+    <title>Public Information Officer Builder (Local-Only)</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <main class="app">
       <header>
-        <h1>Training Scenario Builder</h1>
+        <h1>Public Information Officer</h1>
         <p class="subtitle">
-          Local-only, privacy-first scenario generation. Nothing is saved unless you export.
+          Civil Air Patrol-focused, local-only scenario generation. Nothing is saved unless you export.
         </p>
       </header>
 
@@ -20,19 +20,19 @@
         <form id="scenario-form">
           <div class="grid">
             <label>
-              Training Type
+              CAP Mission Focus
               <select id="trainingType" required>
-                <option value="emergency services">Emergency Services</option>
+                <option value="mission base operations" selected>Mission Base Operations</option>
+                <option value="search and rescue">Search and Rescue</option>
+                <option value="disaster relief">Disaster Relief</option>
                 <option value="public affairs">Public Affairs</option>
-                <option value="leadership">Leadership</option>
-                <option value="communications">Communications</option>
-                <option value="tabletop" selected>Tabletop</option>
+                <option value="cadet activity support">Cadet Activity Support</option>
               </select>
             </label>
 
             <label>
               Audience
-              <input id="audience" type="text" value="Mid-level managers" required />
+              <input id="audience" type="text" value="CAP PIOs and mission staff" required />
             </label>
 
             <label>
@@ -51,7 +51,7 @@
 
             <label>
               Setting
-              <input id="setting" type="text" value="Regional operations center" required />
+              <input id="setting" type="text" value="CAP mission base" required />
             </label>
 
             <label>

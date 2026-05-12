@@ -1,64 +1,72 @@
 const templates = {
-  "emergency services": {
+  "mission base operations": {
     objectives: [
-      "Demonstrate incident command structure activation.",
-      "Coordinate interagency communication under pressure.",
-      "Apply responder safety and triage priorities."
+      "Establish Civil Air Patrol incident support workflows using ICS structure.",
+      "Synchronize aircrew, ground team, and mission staff communications.",
+      "Prioritize safety, accountability, and sortie readiness under time pressure."
     ],
     injects: [
-      "Conflicting radio traffic causes delayed dispatch updates.",
-      "A secondary hazard emerges near the incident perimeter.",
-      "A critical resource request exceeds current availability."
+      "Weather shifts force rapid sortie replanning and crew brief updates.",
+      "An overdue aircraft report requires immediate mission base coordination.",
+      "Fuel and vehicle availability constraints impact launch timelines."
+    ]
+  },
+  "search and rescue": {
+    objectives: [
+      "Coordinate CAP air and ground assets for time-critical search coverage.",
+      "Use standardized mission documentation and resource tracking.",
+      "Integrate partner-agency updates into operational decisions."
+    ],
+    injects: [
+      "ELT signal quality fluctuates and creates conflicting search vectors.",
+      "A ground team requests medevac support from a remote trailhead.",
+      "Airspace restrictions suddenly reduce available search sectors."
+    ]
+  },
+  "disaster relief": {
+    objectives: [
+      "Plan CAP support for post-disaster assessment and logistics coordination.",
+      "Manage tasking priorities from emergency management partners.",
+      "Maintain mission continuity while protecting volunteer endurance."
+    ],
+    injects: [
+      "A storm-damaged comm relay degrades mission base connectivity.",
+      "A shelter location needs urgent aerial imagery verification.",
+      "Competing task requests exceed available qualified crews."
     ]
   },
   "public affairs": {
     objectives: [
-      "Deliver clear, accurate, and timely public messaging.",
-      "Counter misinformation while maintaining credibility.",
-      "Coordinate messaging across partner organizations."
+      "Deliver timely, accurate CAP mission updates to the public and media.",
+      "Protect operational security while maintaining transparency and trust.",
+      "Coordinate unified messaging with incident command and partner agencies."
     ],
     injects: [
-      "A viral social post alleges inaccurate casualty numbers.",
-      "A reporter requests an immediate live interview.",
-      "An internal memo is leaked and interpreted out of context."
+      "A viral post misidentifies CAP activity as unauthorized flight operations.",
+      "A local station requests a live briefing before facts are fully confirmed.",
+      "Family members post conflicting details about missing-person status online."
     ]
   },
-  leadership: {
+  "cadet activity support": {
     objectives: [
-      "Make time-sensitive decisions with incomplete information.",
-      "Align team actions to strategic intent.",
-      "Balance risk, ethics, and mission outcomes."
+      "Apply CAP safety and supervision standards during high-visibility events.",
+      "Coordinate logistics and communications across senior and cadet staff.",
+      "Respond to emerging issues while preserving training objectives."
     ],
     injects: [
-      "Two senior staff provide conflicting recommendations.",
-      "A high-impact decision must be made within 15 minutes.",
-      "Team morale declines after a visible setback."
-    ]
-  },
-  communications: {
-    objectives: [
-      "Use established communication protocols effectively.",
-      "Maintain message discipline across channels.",
-      "Escalate critical information through proper pathways."
-    ],
-    injects: [
-      "Primary communication channel fails unexpectedly.",
-      "A stakeholder receives contradictory instructions.",
-      "A key update is delayed due to approval bottlenecks."
-    ]
-  },
-  tabletop: {
-    objectives: [
-      "Validate plans, policies, and decision pathways.",
-      "Identify coordination gaps and ambiguous responsibilities.",
-      "Build shared understanding of response priorities."
-    ],
-    injects: [
-      "An assumption in the written plan proves invalid.",
-      "A partner agency cannot meet its planned timeline.",
-      "A legal/policy constraint affects response options."
+      "Transportation delays threaten the event start timeline.",
+      "A heat advisory requires immediate risk-control adjustments.",
+      "Parents and community members request simultaneous status updates."
     ]
   }
+};
+
+const variablePools = {
+  operationalPeriods: ["morning", "afternoon", "evening", "overnight"],
+  weatherStates: ["VFR with increasing winds", "IFR ceilings", "thunderstorm watch", "extreme heat advisory"],
+  mediaPressure: ["low", "moderate", "high", "intense"],
+  commsStatus: ["stable", "degraded repeater coverage", "intermittent data loss", "primary channel outage"],
+  partnerCadence: ["hourly county EOC calls", "30-minute unified command sync", "ad hoc agency updates", "joint information center rhythm"]
 };
 
 let currentScenario = null;
@@ -74,46 +82,67 @@ function parseCSV(value) {
   return value.split(",").map(v => v.trim()).filter(Boolean);
 }
 
-function buildScenario(input) {
-  const template = templates[input.trainingType] || templates.tabletop;
-  const objectives = input.objectives.length ? input.objectives : template.objectives;
-  const roleCount = Math.min(Math.max(input.participants, 4), 10);
+function pickRandom(items, count = 1) {
+  const shuffled = [...items].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
 
-  const timeline = Array.from({ length: 5 }, (_, i) => {
+function buildScenario(input) {
+  const template = templates[input.trainingType] || templates["mission base operations"];
+  const objectives = input.objectives.length ? input.objectives : pickRandom(template.objectives, 3);
+  const roleCount = Math.min(Math.max(input.participants, 4), 10);
+  const selectedInjects = pickRandom(template.injects, 3);
+  const variables = {
+    operationalPeriod: pickRandom(variablePools.operationalPeriods)[0],
+    weather: pickRandom(variablePools.weatherStates)[0],
+    mediaPressure: pickRandom(variablePools.mediaPressure)[0],
+    comms: pickRandom(variablePools.commsStatus)[0],
+    partnerCadence: pickRandom(variablePools.partnerCadence)[0]
+  };
+
+  const timeline = Array.from({ length: 6 }, (_, i) => {
     const hour = 9 + Math.floor((i * Math.max(10, Math.floor(input.duration / 5))) / 60);
     const minute = (i * Math.max(10, Math.floor(input.duration / 5))) % 60;
     return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")} - Phase ${i + 1}`;
   });
 
   return {
-    title: `${capitalize(input.trainingType)} Scenario: ${capitalize(input.difficulty)} ${input.setting} Coordination Exercise`,
-    overview: `A ${input.duration}-minute ${input.trainingType} exercise for ${input.audience} in a ${input.setting} setting at ${input.difficulty} difficulty.`,
+    title: `Public Information Officer Scenario: ${capitalize(input.difficulty)} ${input.setting} ${capitalize(input.trainingType)} Exercise`,
+    overview: `A ${input.duration}-minute Civil Air Patrol ${input.trainingType} exercise for ${input.audience} in a ${input.setting} setting at ${input.difficulty} difficulty.`,
     trainingObjectives: objectives,
-    participantRoles: Array.from({ length: roleCount }, (_, i) => `Role ${i + 1}: ${i === 0 ? "Facilitator Liaison" : "Participant Lead"}`),
+    participantRoles: Array.from({ length: roleCount }, (_, i) => `Role ${i + 1}: ${i === 0 ? "Public Information Officer" : "Mission Staff Participant"}`),
     timeline,
-    injectsEvents: template.injects.concat(input.constraints.slice(0, 2).map(c => `Constraint pressure: ${c}.`)),
+    scenarioVariables: [
+      `Operational period: ${variables.operationalPeriod}.`,
+      `Weather factor: ${variables.weather}.`,
+      `Media pressure: ${variables.mediaPressure}.`,
+      `Communications status: ${variables.comms}.`,
+      `Partner coordination cadence: ${variables.partnerCadence}.`
+    ],
+    injectsEvents: selectedInjects.concat(input.constraints.slice(0, 2).map(c => `Constraint pressure: ${c}.`)),
     expectedActions: [
-      "Establish clear command/decision roles within first phase.",
-      "Produce a shared action plan with owner and deadline for each task.",
-      "Communicate status updates at defined intervals.",
-      "Document assumptions, risks, and mitigation actions."
+      "Establish PIO battle rhythm with mission base leadership in first phase.",
+      "Draft and deliver synchronized internal and external updates.",
+      "Track approvals and release authoritative messaging at set intervals.",
+      "Document rumor-control actions, media queries, and disposition outcomes.",
+      "Update the public narrative whenever operational facts materially change."
     ],
     facilitatorNotes: [
-      "Escalate complexity only after participants demonstrate baseline coordination.",
-      "Observe decision rationale, not only outcomes.",
-      "Capture notable communication failures and recoveries for debrief."
+      "Introduce pressure through simultaneous operational and media demands.",
+      "Evaluate factual accuracy, timeliness, and tone of each message product.",
+      "Capture lessons on CAP brand protection and interagency coordination."
     ],
     evaluationRubric: [
-      "Command & Coordination (1-5): role clarity, alignment, control.",
-      "Communication Quality (1-5): timeliness, accuracy, consistency.",
-      "Decision-Making (1-5): risk balance, prioritization, adaptability.",
-      "Execution (1-5): task completion, accountability, follow-through."
+      "Operational Awareness (1-5): mission understanding and fact validation.",
+      "Public Messaging (1-5): clarity, consistency, and confidence.",
+      "Coordination (1-5): alignment with IC, operations, and partners.",
+      "Execution (1-5): deadlines met, products delivered, corrective actions."
     ],
     aarQuestions: [
-      "What signals were recognized early, late, or missed?",
-      "Which decisions had the greatest downstream impact?",
-      "Where did communication break down and why?",
-      "What plan, policy, or training updates should be made?",
+      "Which information flows enabled timely public updates?",
+      "Where did approval or coordination bottlenecks appear?",
+      "How effectively were misinformation and rumor risks addressed?",
+      "What PIO playbook updates should be made for future CAP responses?",
       "What should be sustained, improved, and stopped?"
     ]
   };
@@ -130,6 +159,7 @@ function toMarkdown(s) {
     section("Training Objectives", s.trainingObjectives),
     section("Participant Roles", s.participantRoles),
     section("Timeline", s.timeline),
+    section("Scenario Variables", s.scenarioVariables),
     section("Injects/Events", s.injectsEvents),
     section("Expected Participant Actions", s.expectedActions),
     section("Facilitator Notes", s.facilitatorNotes),

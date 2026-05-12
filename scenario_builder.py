@@ -8,74 +8,85 @@
 
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from textwrap import fill
 from typing import Dict, List
 
 
+VARIABLE_POOLS: Dict[str, List[str]] = {
+    "operational_periods": ["morning", "afternoon", "evening", "overnight"],
+    "weather_states": ["VFR with increasing winds", "IFR ceilings", "thunderstorm watch", "extreme heat advisory"],
+    "media_pressure": ["low", "moderate", "high", "intense"],
+    "comms_status": ["stable", "degraded repeater coverage", "intermittent data loss", "primary channel outage"],
+    "partner_cadence": ["hourly county EOC calls", "30-minute unified command sync", "ad hoc agency updates", "joint information center rhythm"],
+}
+
+
 TEMPLATES: Dict[str, Dict[str, List[str]]] = {
-    "emergency services": {
+    "mission base operations": {
         "objectives": [
-            "Demonstrate incident command structure activation.",
-            "Coordinate interagency communication under pressure.",
-            "Apply responder safety and triage priorities.",
+            "Establish Civil Air Patrol incident support workflows using ICS structure.",
+            "Synchronize aircrew, ground team, and mission staff communications.",
+            "Prioritize safety, accountability, and sortie readiness under time pressure.",
         ],
         "injects": [
-            "Conflicting radio traffic causes delayed dispatch updates.",
-            "A secondary hazard emerges near the incident perimeter.",
-            "A critical resource request exceeds current availability.",
+            "Weather shifts force rapid sortie replanning and crew brief updates.",
+            "An overdue aircraft report requires immediate mission base coordination.",
+            "Fuel and vehicle availability constraints impact launch timelines.",
+        ],
+    },
+    "search and rescue": {
+        "objectives": [
+            "Coordinate CAP air and ground assets for time-critical search coverage.",
+            "Use standardized mission documentation and resource tracking.",
+            "Integrate partner-agency updates into operational decisions.",
+        ],
+        "injects": [
+            "ELT signal quality fluctuates and creates conflicting search vectors.",
+            "A ground team requests medevac support from a remote trailhead.",
+            "Airspace restrictions suddenly reduce available search sectors.",
+        ],
+    },
+    "disaster relief": {
+        "objectives": [
+            "Plan CAP support for post-disaster assessment and logistics coordination.",
+            "Manage tasking priorities from emergency management partners.",
+            "Maintain mission continuity while protecting volunteer endurance.",
+        ],
+        "injects": [
+            "A storm-damaged comm relay degrades mission base connectivity.",
+            "A shelter location needs urgent aerial imagery verification.",
+            "Competing task requests exceed available qualified crews.",
         ],
     },
     "public affairs": {
         "objectives": [
-            "Deliver clear, accurate, and timely public messaging.",
-            "Counter misinformation while maintaining credibility.",
-            "Coordinate messaging across partner organizations.",
+            "Deliver timely, accurate CAP mission updates to the public and media.",
+            "Protect operational security while maintaining transparency and trust.",
+            "Coordinate unified messaging with incident command and partner agencies.",
         ],
         "injects": [
-            "A viral social post alleges inaccurate casualty numbers.",
-            "A reporter requests an immediate live interview.",
-            "An internal memo is leaked and interpreted out of context.",
+            "A viral post misidentifies CAP activity as unauthorized flight operations.",
+            "A local station requests a live briefing before facts are fully confirmed.",
+            "Family members post conflicting details about missing-person status online.",
         ],
     },
-    "leadership": {
+    "cadet activity support": {
         "objectives": [
-            "Make time-sensitive decisions with incomplete information.",
-            "Align team actions to strategic intent.",
-            "Balance risk, ethics, and mission outcomes.",
+            "Apply CAP safety and supervision standards during high-visibility events.",
+            "Coordinate logistics and communications across senior and cadet staff.",
+            "Respond to emerging issues while preserving training objectives.",
         ],
         "injects": [
-            "Two senior staff provide conflicting recommendations.",
-            "A high-impact decision must be made within 15 minutes.",
-            "Team morale declines after a visible setback.",
-        ],
-    },
-    "communications": {
-        "objectives": [
-            "Use established communication protocols effectively.",
-            "Maintain message discipline across channels.",
-            "Escalate critical information through proper pathways.",
-        ],
-        "injects": [
-            "Primary communication channel fails unexpectedly.",
-            "A stakeholder receives contradictory instructions.",
-            "A key update is delayed due to approval bottlenecks.",
-        ],
-    },
-    "tabletop": {
-        "objectives": [
-            "Validate plans, policies, and decision pathways.",
-            "Identify coordination gaps and ambiguous responsibilities.",
-            "Build shared understanding of response priorities.",
-        ],
-        "injects": [
-            "An assumption in the written plan proves invalid.",
-            "A partner agency cannot meet its planned timeline.",
-            "A legal/policy constraint affects response options.",
+            "Transportation delays threaten the event start timeline.",
+            "A heat advisory requires immediate risk-control adjustments.",
+            "Parents and community members request simultaneous status updates.",
         ],
     },
 }
+
 
 
 @dataclass
@@ -101,22 +112,22 @@ def parse_list(raw: str) -> List[str]:
 
 
 def collect_inputs() -> Inputs:
-    print("\n=== Training Scenario Builder (Local-Only CLI) ===")
+    print("\n=== Public Information Officer Builder (Local-Only CLI) ===")
     print("All data remains in-memory and is not saved unless you export.\n")
 
     training_type = ask(
-        "Training type (emergency services/public affairs/leadership/communications/tabletop)",
-        "tabletop",
+        "Training type (mission base operations/search and rescue/disaster relief/public affairs/cadet activity support)",
+        "mission base operations",
     ).lower()
     if training_type not in TEMPLATES:
-        print("Unknown type; using 'tabletop' template defaults.")
-        training_type = "tabletop"
+        print("Unknown type; using 'mission base operations' template defaults.")
+        training_type = "mission base operations"
 
-    audience = ask("Audience", "Mid-level managers")
+    audience = ask("Audience", "CAP PIOs and mission staff")
     duration_minutes = int(ask("Duration in minutes", "120"))
     difficulty = ask("Difficulty (beginner/intermediate/advanced)", "intermediate")
     objectives = parse_list(ask("Objectives (comma-separated, optional)", ""))
-    setting = ask("Setting", "Regional operations center")
+    setting = ask("Setting", "CAP mission base")
     participants = int(ask("Number of participants", "12"))
     constraints = parse_list(
         ask("Constraints (comma-separated, optional)", "limited staffing, media pressure")
@@ -136,16 +147,18 @@ def collect_inputs() -> Inputs:
 
 def build_scenario(data: Inputs) -> Dict[str, object]:
     template = TEMPLATES[data.training_type]
-    objectives = data.objectives or template["objectives"]
+    objectives = data.objectives or random.sample(
+        template["objectives"], k=min(3, len(template["objectives"]))
+    )
 
     title = (
-        f"{data.training_type.title()} Scenario: {data.difficulty.title()} "
-        f"{data.setting} Coordination Exercise"
+        f"Public Information Officer Scenario: {data.difficulty.title()} "
+        f"{data.setting} {data.training_type.title()} Exercise"
     )
 
     num_roles = min(max(data.participants, 4), 10)
     roles = [
-        f"Role {i+1}: {'Facilitator Liaison' if i == 0 else 'Participant Lead'}"
+        f"Role {i+1}: {'Public Information Officer' if i == 0 else 'Mission Staff Participant'}"
         for i in range(num_roles)
     ]
 
@@ -153,10 +166,18 @@ def build_scenario(data: Inputs) -> Dict[str, object]:
     step = max(10, data.duration_minutes // 5)
     timeline = [
         f"{(start + timedelta(minutes=i*step)).strftime('%H:%M')} - Phase {i+1}"
-        for i in range(5)
+        for i in range(6)
     ]
 
-    injects = template["injects"] + [
+    scenario_variables = [
+        f"Operational period: {random.choice(VARIABLE_POOLS['operational_periods'])}.",
+        f"Weather factor: {random.choice(VARIABLE_POOLS['weather_states'])}.",
+        f"Media pressure: {random.choice(VARIABLE_POOLS['media_pressure'])}.",
+        f"Communications status: {random.choice(VARIABLE_POOLS['comms_status'])}.",
+        f"Partner coordination cadence: {random.choice(VARIABLE_POOLS['partner_cadence'])}.",
+    ]
+
+    injects = random.sample(template["injects"], k=min(3, len(template["injects"]))) + [
         f"Constraint pressure: {c}." for c in data.constraints[:2]
     ]
 
@@ -165,6 +186,7 @@ def build_scenario(data: Inputs) -> Dict[str, object]:
         "Produce a shared action plan with owner and deadline for each task.",
         "Communicate status updates at defined intervals.",
         "Document assumptions, risks, and mitigation actions.",
+        "Update the public narrative whenever operational facts materially change.",
     ]
 
     facilitator_notes = [
@@ -191,12 +213,13 @@ def build_scenario(data: Inputs) -> Dict[str, object]:
     return {
         "title": title,
         "overview": (
-            f"A {data.duration_minutes}-minute {data.training_type} exercise for "
+            f"A {data.duration_minutes}-minute Civil Air Patrol {data.training_type} exercise for "
             f"{data.audience} in a {data.setting} setting at {data.difficulty} difficulty."
         ),
         "training_objectives": objectives,
         "participant_roles": roles,
         "timeline": timeline,
+        "scenario_variables": scenario_variables,
         "injects_events": injects,
         "expected_actions": expected_actions,
         "facilitator_notes": facilitator_notes,
@@ -223,6 +246,9 @@ def render_markdown(pkg: Dict[str, object]) -> str:
 
 ## Timeline
 {md_list(pkg['timeline'])}
+
+## Scenario Variables
+{md_list(pkg['scenario_variables'])}
 
 ## Injects/Events
 {md_list(pkg['injects_events'])}
