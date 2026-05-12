@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Training Scenario Builder (Local-Only)</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header>
+        <h1>Training Scenario Builder</h1>
+        <p class="subtitle">
+          Local-only, privacy-first scenario generation. Nothing is saved unless you export.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>Scenario Inputs</h2>
+        <form id="scenario-form">
+          <div class="grid">
+            <label>
+              Training Type
+              <select id="trainingType" required>
+                <option value="emergency services">Emergency Services</option>
+                <option value="public affairs">Public Affairs</option>
+                <option value="leadership">Leadership</option>
+                <option value="communications">Communications</option>
+                <option value="tabletop" selected>Tabletop</option>
+              </select>
+            </label>
+
+            <label>
+              Audience
+              <input id="audience" type="text" value="Mid-level managers" required />
+            </label>
+
+            <label>
+              Duration (minutes)
+              <input id="duration" type="number" min="30" value="120" required />
+            </label>
+
+            <label>
+              Difficulty
+              <select id="difficulty" required>
+                <option>beginner</option>
+                <option selected>intermediate</option>
+                <option>advanced</option>
+              </select>
+            </label>
+
+            <label>
+              Setting
+              <input id="setting" type="text" value="Regional operations center" required />
+            </label>
+
+            <label>
+              Participants
+              <input id="participants" type="number" min="2" value="12" required />
+            </label>
+          </div>
+
+          <label>
+            Objectives (comma-separated, optional)
+            <textarea id="objectives" rows="3" placeholder="Objective 1, Objective 2"></textarea>
+          </label>
+
+          <label>
+            Constraints (comma-separated, optional)
+            <textarea id="constraints" rows="3" placeholder="limited staffing, media pressure"></textarea>
+          </label>
+
+          <div class="actions">
+            <button type="submit">Generate Preview</button>
+            <button id="clearBtn" type="button" class="secondary">Clear In-Memory Data</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Preview</h2>
+        <p class="hint">Review before export. Preview is in-memory only.</p>
+        <article id="preview" class="preview empty">No scenario generated yet.</article>
+
+        <div class="actions export-actions">
+          <button id="exportMd" type="button" disabled>Export Markdown</button>
+          <button id="exportDocx" type="button" disabled>Export DOCX</button>
+          <button id="exportPdf" type="button" disabled>Export PDF</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
