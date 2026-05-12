@@ -1,6 +1,6 @@
-# Training Scenario Builder (Local-Only Web App)
+# Public Information Officer Builder (Local-Only Web App)
 
-A privacy-focused, offline web tool that generates structured training scenarios from user parameters.
+A privacy-focused, offline web tool that generates Civil Air Patrol-themed Public Information Officer training scenarios from user parameters, with randomized objectives, injects, and scenario variables for variety across runs.
 
 ## Privacy & Local-Only Design
 - Runs entirely locally in your browser.
@@ -8,15 +8,15 @@ A privacy-focused, offline web tool that generates structured training scenarios
 - No automatic persistence of prompts, user input, or generated scenarios.
 - Scenario data remains in memory and can be cleared at any time; closing/reloading the tab clears runtime state.
 
-## Included Templates
-- Emergency services
+## Included CAP Mission Themes
+- Mission base operations
+- Search and rescue
+- Disaster relief
 - Public affairs
-- Leadership
-- Communications
-- Tabletop
+- Cadet activity support
 
 ## Inputs Supported
-- Training type
+- CAP mission focus
 - Audience
 - Duration
 - Difficulty
@@ -31,6 +31,7 @@ A privacy-focused, offline web tool that generates structured training scenarios
 - Training objectives
 - Participant roles
 - Timeline
+- Scenario variables
 - Injects/events
 - Expected participant actions
 - Facilitator notes
