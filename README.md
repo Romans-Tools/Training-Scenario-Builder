@@ -1,20 +1,22 @@
-# Training Scenario Builder (Local-Only)
+# Training Scenario Builder (Local-Only Web App)
 
-A privacy-focused, offline CLI tool to generate structured training scenarios from user parameters.
+A privacy-focused, offline web tool that generates structured training scenarios from user parameters.
 
 ## Privacy & Local-Only Design
-- Runs entirely on your local machine.
-- No network calls.
-- Does not save prompts, scenario content, or user input unless you explicitly export.
-- Keeps working data in memory and clears it on process exit.
+- Runs entirely locally in your browser.
+- No network/API calls.
+- No automatic persistence of prompts, user input, or generated scenarios.
+- Scenario data remains in memory and can be cleared at any time; closing/reloading the tab clears runtime state.
+
+## Included Templates
+- Emergency services
+- Public affairs
+- Leadership
+- Communications
+- Tabletop
 
 ## Inputs Supported
-- Training type (templates included):
-  - emergency services
-  - public affairs
-  - leadership
-  - communications
-  - tabletop
+- Training type
 - Audience
 - Duration
 - Difficulty
@@ -23,7 +25,7 @@ A privacy-focused, offline CLI tool to generate structured training scenarios fr
 - Number of participants
 - Constraints
 
-## Output Package Includes
+## Output Package
 - Scenario title
 - Overview
 - Training objectives
@@ -35,21 +37,18 @@ A privacy-focused, offline CLI tool to generate structured training scenarios fr
 - Evaluation rubric
 - After-action review questions
 
-## Usage
+## Run Locally
+Open `index.html` directly in your browser:
+
 ```bash
-python3 scenario_builder.py
+xdg-open index.html
 ```
 
-You will be shown a preview before export.
+Or use any local static file server if preferred.
 
-## Export Formats
-- Markdown (`.md`) built-in
-- PDF (`.pdf`) via `reportlab`
-- DOCX (`.docx`) via `python-docx`
+## Export
+- Markdown: direct download
+- DOCX-compatible export: Word-readable `.doc` download
+- PDF: browser print-to-PDF flow
 
-Install optional export dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-If optional libraries are missing, the tool remains fully functional for generation and Markdown export.
+A preview is always shown before export.
